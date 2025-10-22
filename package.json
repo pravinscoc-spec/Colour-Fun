@@ -1,13 +1,15 @@
 {
   "name": "telegram-betting-game",
   "version": "1.0.0",
-  "description": "Telegram Web App Backend for Betting Game",
+  "description": "Telegram Web App Betting Game Backend",
   "main": "api/bot.js",
+  "dependencies": {
+    "mongoose": "^8.0.0",
+    "node-telegram-bot-api": "^0.64.0",
+    "eventemitter3": "^4.0.7" 
+    // Mongoose requires eventemitter3 implicitly, but listing it helps
+  },
   "scripts": {
     "start": "node api/bot.js"
-  },
-  "dependencies": {
-    "mongoose": "^8.4.1",
-    "node-telegram-bot-api": "^0.61.0"
   }
 }
