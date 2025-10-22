@@ -6,6 +6,8 @@ const User = require('./models/User');        // <-- FIX IS HERE
 const Transaction = require('./models/Transaction');
 const config = require('./config');
 
+console.log(`VERIFY: Token status. Length is: ${config.BOT_TOKEN ? config.BOT_TOKEN.length : 'NULL'}`);
+
 const bot = new TelegramBot(config.BOT_TOKEN, { polling: false });
 
 console.log(`[DEBUG 2] Bot instance created.`);
