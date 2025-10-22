@@ -7,7 +7,6 @@
     "mongoose": "^8.0.0",
     "node-telegram-bot-api": "^0.64.0",
     "eventemitter3": "^4.0.7" 
-    // Mongoose requires eventemitter3 implicitly, but listing it helps
   },
   "scripts": {
     "start": "node api/bot.js"
