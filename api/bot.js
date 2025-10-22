@@ -2,7 +2,7 @@
 
 const TelegramBot = require('node-telegram-bot-api');
 const connectToDatabase = require('./utils/db');
-const User = require require('./models/User');
+const User = require('./models/User');        // <-- FIX IS HERE
 const Transaction = require('./models/Transaction');
 const config = require('./config');
 
