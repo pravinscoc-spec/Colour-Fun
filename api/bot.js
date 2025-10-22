@@ -8,6 +8,8 @@ const config = require('./config');
 
 const bot = new TelegramBot(config.BOT_TOKEN, { polling: false });
 
+console.log(`[DEBUG 2] Bot instance created.`);
+
 // --- Keyboard Definitions ---
 const mainKeyboard = {
     reply_markup: {
