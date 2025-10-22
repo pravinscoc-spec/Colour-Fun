@@ -1,10 +1,10 @@
 // api/bot.js - The Main Telegram Bot Handler
 
-const TelegramBot = require('node-telegram-bot-api');
-const config = require('./config');
-const connectToDatabase = () => console.log('DB Mocked.'); // <-- MOCK
-const User = {};                                           // <-- MOCK
-const Transaction = {};                                    // <-- MOCK
+//const TelegramBot = require('node-telegram-bot-api');
+const TelegramBot = function() {};
+// const connectToDatabase = require('./utils/db'); // MOCKED
+// const User = require('./models/User'); // MOCKED
+// const Transaction = require('./models/Transaction'); // MOCKED
 
 console.log(`VERIFY: Token status. Length is: ${config.BOT_TOKEN ? config.BOT_TOKEN.length : 'NULL'}`);
 
