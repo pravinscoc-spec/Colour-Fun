@@ -1,0 +1,13 @@
+{
+  "name": "telegram-betting-game",
+  "version": "1.0.0",
+  "description": "Telegram Web App Backend for Betting Game",
+  "main": "api/bot.js",
+  "scripts": {
+    "start": "node api/bot.js"
+  },
+  "dependencies": {
+    "mongoose": "^8.4.1",
+    "node-telegram-bot-api": "^0.61.0"
+  }
+}

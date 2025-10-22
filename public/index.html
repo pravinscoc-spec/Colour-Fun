@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Betting Game</title>
+    <style>
+        :root {
+            --bg-color: #1a1a2e;
+            --card-bg: #2d2a41;
+            --text-color: #ffffff;
+            --accent-color: #e94560;
+            --button-color: #0f3460;
+            --green: #4caf50;
+            --red: #f44336;
+            --violet: #9c27b0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* --- Header & Tabs --- */
+        .header {
+            width: 100%;
+            background-color: var(--card-bg);
+            padding: 10px 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .balance-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.2em;
+        }
+
+        .tabs {
+            display: flex;
+            justify-content: space-around;
+            background-color: var(--card-bg);
+            border-top: 1px solid #3d3b50;
+            margin-top: 10px;
+        }
+
+        .tab-button {
+            flex-grow: 1;
+            padding: 10px;
+            background: none;
+            border: none;
+            color: var(--text-color);
+            font-size: 1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-button.active {
+            border-bottom: 3px solid var(--accent-color);
+            color: var(--accent-color);
+        }
+
+        .tab-content {
+            display: none;
+            width: 100%;
+            max-width: 600px;
+            padding: 15px;
+            box-sizing: border-box;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* --- Game Area --- */
+        .game-area {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .period-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+
+        .timer-container {
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            background-color: rgba(0, 0, 0, 0.5);
+            transition: background-color 0.5s;
+        }
+
+        .timer-container h3 {
+            margin: 0;
+            font-size: 1.1em;
+            color: var(--accent-color);
+        }
+
+        #timerDisplay {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: var(--text-color);
+        }
+        
+        .bet-status {
+            font-size: 0.8em;
+            color: #ccc;
+            margin-top: 5px;
+        }
+
+        /* --- Bet Controls --- */
+        .bet-controls {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .bet-option {
+            padding: 15px 10px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.1s;
+        }
+
+        .bet-option:active {
+            transform: scale(0.98);
+        }
+
+        .bet-option.color {
+            font-size: 1.1em;
+            color: #000;
+        }
+
+        .bet-option.green { background-color: var(--green); }
+        .bet-option.red { background-color: var(--red); }
+        .bet-option.violet { background-color: var(--violet); }
+
+        .bet-option.number {
+            background-color: var(--button-color);
+            font-size: 1.5em;
+        }
+        
+        .bet-option.number:nth-child(4) { border: 2px solid var(--green); }
+        .bet-option.number:nth-child(5) { border: 2px solid var(--violet); }
+        .bet-option.number:nth-child(9) { border: 2px solid var(--violet); }
+
+        /* --- Bet Amount Modal --- */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 350px;
+            text-align: center;
+        }
+
+        .modal-content h4 { margin-top: 0; }
+
+        .modal-content input {
+            width: 90%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            background-color: #1a1a2e;
+            color: var(--text-color);
+            font-size: 1.2em;
+            text-align: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 10px;
+        }
+        
+        .quick-amounts {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 15px;
+        }
+        
+        .quick-amounts button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 5px;
+            background-color: var(--button-color);
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
+        .btn-confirm {
+            background-color: var(--green);
+            color: var(--text-color);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-cancel {
+            background-color: var(--red);
+            color: var(--text-color);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        /* --- History Section --- */
+        .history-section {
+            width: 100%;
+            margin-top: 15px;
+        }
+        
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #3d3b50;
+        }
+
+        .history-item span {
+            font-size: 0.9em;
+        }
+
+        .result-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+            text-align: center;
+            line-height: 16px;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+
+        .color-green { background-color: var(--green); }
+        .color-red { background-color: var(--red); }
+        .color-violet { background-color: var(--violet); }
+
+        /* --- Profile Section --- */
+        .profile-info p {
+            background-color: #3d3b50;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="balance-container">
+            <span>Balance: <span id="currentBalance">₹ 0.00</span></span>
+            <span>Period: <span id="periodId">N/A</span></span>
+        </div>
+        <div class="tabs">
+            <button class="tab-button active" data-tab="game">Game</button>
+            <button class="tab-button" data-tab="history">History</button>
+            <button class="tab-button" data-tab="profile">Profile</button>
+        </div>
+    </div>
+
+    <div id="game" class="tab-content active">
+        <div class="game-area">
+            <div class="period-info">
+                <span>Next Draw in:</span>
+                <div class="timer-container">
+                    <h3 class="bet-status">BET IS OPEN</h3>
+                    <span id="timerDisplay">60</span>
+                </div>
+            </div>
+
+            <div class="last-result-container" style="text-align: center; margin-bottom: 20px;">
+                <h4>Last Result</h4>
+                <div id="lastResult" style="font-size: 2em; font-weight: bold; color: var(--green);">--</div>
+            </div>
+
+            <div class="bet-controls">
+                <div class="bet-option color green" data-selection="G">BET GREEN (1:2)</div>
+                <div class="bet-option color violet" data-selection="V">BET VIOLET (1:4.5)</div>
+                <div class="bet-option color red" data-selection="R">BET RED (1:2)</div>
+                
+                <div class="bet-option number" data-selection="0">0</div>
+                <div class="bet-option number" data-selection="1">1</div>
+                <div class="bet-option number" data-selection="2">2</div>
+                <div class="bet-option number" data-selection="3">3</div>
+                <div class="bet-option number" data-selection="4">4</div>
+                <div class="bet-option number" data-selection="5">5</div>
+                <div class="bet-option number" data-selection="6">6</div>
+                <div class="bet-option number" data-selection="7">7</div>
+                <div class="bet-option number" data-selection="8">8</div>
+                <div class="bet-option number" data-selection="9">9</div>
+            </div>
+        </div>
+    </div>
+
+    <div id="history" class="tab-content">
+        <div class="history-section">
+            <h3>Global Results</h3>
+            <div id="globalHistoryList">
+                </div>
+        </div>
+        
+        <div class="history-section">
+            <h3>My Bets</h3>
+            <div id="myBetsList">
+                </div>
+        </div>
+    </div>
+
+    <div id="profile" class="tab-content">
+        <div class="profile-info">
+            <h3>Account Details</h3>
+            <p>Telegram ID: <span id="profileTgId">N/A</span></p>
+            <p>Username: <span id="profileUsername">N/A</span></p>
+            <p>Wallet Balance: <span id="profileRealBalance">₹ 0.00</span></p>
+            <p>Rollover: <span id="profilePoints">₹ 0.00 / ₹ 0.00</span></p>
+        </div>
+    </div>
+
+    <div id="betModal" class="modal">
+        <div class="modal-content">
+            <h4>Place Bet on <span id="modalSelection"></span></h4>
+            <input type="number" id="betAmountInput" placeholder="Enter Amount (min 10)">
+            
+            <div class="quick-amounts">
+                <button onclick="setBetAmount(10)">+10</button>
+                <button onclick="setBetAmount(100)">+100</button>
+                <button onclick="setBetAmount(500)">+500</button>
+                <button onclick="multiplyBetAmount(2)">x2</button>
+            </div>
+
+            <div class="modal-buttons">
+                <button class="btn-confirm" id="confirmBetBtn">CONFIRM</button>
+                <button class="btn-cancel" onclick="closeModal()">CANCEL</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Configuration & Initialization ---
+
+        // IMPORTANT: Replace this with your actual Vercel domain!
+        const BACKEND_URL = "https://<YOUR_VERCEL_APP>.vercel.app/api/game_api"; 
+        
+        let tgUser = null;
+        let selectedBet = null;
+        let timerInterval;
+
+        // Initialize Telegram Web App
+        if (window.Telegram && window.Telegram.WebApp) {
+            const WebApp = window.Telegram.WebApp;
+            WebApp.ready();
+            WebApp.expand();
+            
+            // Extract user data from initData (simplified for demo, production needs initData validation)
+            const initData = new URLSearchParams(WebApp.initData);
+            const userString = initData.get('user');
+            if (userString) {
+                try {
+                    tgUser = JSON.parse(decodeURIComponent(userString));
+                    document.getElementById('profileTgId').textContent = tgUser.id;
+                    document.getElementById('profileUsername').textContent = `@${tgUser.username || 'N/A'}`;
+                    fetchUserData();
+                } catch (e) {
+                    console.error("Error parsing user data:", e);
+                }
+            } else {
+                 // Fallback for local testing (use a mock user)
+                 tgUser = { id: 12345678, username: 'tester' };
+                 document.getElementById('profileTgId').textContent = tgUser.id + ' (Mock)';
+                 document.getElementById('profileUsername').textContent = '@tester (Mock)';
+                 fetchUserData();
+            }
+        } else {
+             // Fallback for local testing (use a mock user)
+            tgUser = { id: 12345678, username: 'tester' };
+            document.getElementById('profileTgId').textContent = tgUser.id + ' (Mock)';
+            document.getElementById('profileUsername').textContent = '@tester (Mock)';
+            fetchUserData();
+        }
+
+        // --- Tab Switching Logic ---
+        document.querySelectorAll('.tab-button').forEach(button => {
+            button.addEventListener('click', () => {
+                const targetTab = button.getAttribute('data-tab');
+                
+                document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    if (content.id === targetTab) {
+                        content.classList.add('active');
+                    } else {
+                        content.classList.remove('active');
+                    }
+                });
+            });
+        });
+
+        // --- Game State & API Functions ---
+
+        /** Fetches current game state, user balance, and history. */
+        async function fetchUserData() {
+            if (!tgUser) return;
+            
+            try {
+                const response = await fetch(`${BACKEND_URL}?action=sync&tgId=${tgUser.id}`);
+                if (!response.ok) throw new Error("Failed to sync game data.");
+                
+                const data = await response.json();
+                
+                // Update UI with live data
+                document.getElementById('currentBalance').textContent = `₹ ${data.user.balance.toFixed(2)}`;
+                document.getElementById('profileRealBalance').textContent = `₹ ${data.user.balance.toFixed(2)}`;
+                
+                // Update Game State
+                document.getElementById('periodId').textContent = data.gameState.id;
+                startTimer(data.gameState.secondsLeft);
+                
+                // Update Rollover (for Profile)
+                const required = data.user.requiredRollover;
+                const current = data.user.currentRollover;
+                document.getElementById('profilePoints').textContent = `Rollover: ₹ ${current.toFixed(2)} / ₹ ${required.toFixed(2)}`;
+                
+                // Render history
+                renderHistory(data.history.global, data.history.myBets); 
+                
+                // Update last result display
+                const lastResultElement = document.getElementById('lastResult');
+                if (data.gameState.lastResult !== null) {
+                    lastResultElement.textContent = data.gameState.lastResult;
+                    lastResultElement.style.color = getColorCode(data.gameState.lastResult);
+                } else {
+                     lastResultElement.textContent = '--';
+                     lastResultElement.style.color = '#ccc';
+                }
+
+            } catch (error) {
+                console.error("Sync Error:", error);
+                // Show an error to the user
+            }
+        }
+
+        /** Places a bet via the backend API. */
+        async function placeBet(selection, amount) {
+            if (!tgUser) { alert("User not logged in."); return; }
+            if (amount < 10) { alert("Minimum bet is 10."); return; }
+            
+            const betAmount = parseFloat(amount.toFixed(2));
+
+            try {
+                const response = await fetch(BACKEND_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'bet', 
+                        tgId: tgUser.id,
+                        selection: selection,
+                        amount: betAmount,
+                        // initData: window.Telegram.WebApp.initData // Use for real security check
+                    })
+                });
+
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert(`Bet placed on ${selection} for ₹ ${betAmount}!`);
+                    // Update UI instantly
+                    document.getElementById('currentBalance').textContent = `₹ ${result.newBalance.toFixed(2)}`;
+                    document.getElementById('profileRealBalance').textContent = `₹ ${result.newBalance.toFixed(2)}`;
+                    closeModal();
+                    // Re-sync to update rollover and history
+                    fetchUserData(); 
+                    
+                } else {
+                    alert(`Bet failed: ${result.message}`);
+                    closeModal();
+                }
+                
+            } catch (error) {
+                alert("A network error occurred while placing the bet.");
+            }
+        }
+
+        // --- Client-Side Game Logic (Timer & History Rendering) ---
+
+        function getColorCode(number) {
+            if (number === 0 || number === 5) return 'var(--violet)'; // 0 and 5 are split colors in many games, but here we use violet as primary
+            if (number % 2 === 0) return 'var(--green)';
+            return 'var(--red)';
+        }
+        
+        function getSelectionText(selection) {
+            switch(selection) {
+                case 'G': return 'Green';
+                case 'R': return 'Red';
+                case 'V': return 'Violet';
+                default: return selection;
+            }
+        }
+
+        function startTimer(seconds) {
+            clearInterval(timerInterval);
+            let timeLeft = seconds;
+            const timerDisplay = document.getElementById('timerDisplay');
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                timerDisplay.textContent = timeLeft;
+
+                if (timeLeft <= 5) {
+                    document.querySelector('.bet-status').textContent = 'CLOSING SOON';
+                    document.querySelector('.timer-container').style.backgroundColor = 'rgba(255, 60, 60, 0.2)';
+                } else if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    timerDisplay.textContent = '0';
+                    document.querySelector('.bet-status').textContent = 'WAITING RESULT';
+                    document.querySelector('.timer-container').style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+                    
+                    // Re-sync after result (in a few seconds)
+                    setTimeout(fetchUserData, 5000); 
+
+                } else {
+                     document.querySelector('.bet-status').textContent = 'BET IS OPEN';
+                     document.querySelector('.timer-container').style.backgroundColor = 'var(--card-bg)';
+                }
+            }, 1000);
+        }
+
+        function renderHistory(globalHistory, myBets) {
+            const globalList = document.getElementById('globalHistoryList');
+            const myBetsList = document.getElementById('myBetsList');
+            
+            globalList.innerHTML = '';
+            myBetsList.innerHTML = '';
+            
+            globalHistory.forEach(item => {
+                const color = getColorCode(item.result);
+                const dotHtml = `<span class="result-dot" style="background-color: ${color};">${item.result}</span>`;
+                globalList.innerHTML += `
+                    <div class="history-item">
+                        <span>Period: ${item.period}</span>
+                        <span>${dotHtml}</span>
+                    </div>
+                `;
+            });
+            
+            myBets.forEach(item => {
+                const selectionText = getSelectionText(item.selection);
+                const statusColor = (item.type === 'Win') ? 'var(--green)' : '#ccc';
+                myBetsList.innerHTML += `
+                    <div class="history-item">
+                        <span>Txn: ${item.transactionId.substring(4, 10)}</span>
+                        <span>Bet: ${selectionText}</span>
+                        <span>Amount: ₹ ${item.amount.toFixed(2)}</span>
+                        <span style="color: ${statusColor};">${item.type}</span>
+                    </div>
+                `;
+            });
+            
+            if (globalHistory.length === 0) globalList.innerHTML = '<p style="text-align:center;">No global history yet.</p>';
+            if (myBets.length === 0) myBetsList.innerHTML = '<p style="text-align:center;">No bets placed yet.</p>';
+        }
+
+
+        // --- Modal & Betting Event Listeners ---
+        
+        document.querySelectorAll('.bet-option').forEach(option => {
+            option.addEventListener('click', () => {
+                selectedBet = option.getAttribute('data-selection');
+                document.getElementById('modalSelection').textContent = getSelectionText(selectedBet);
+                document.getElementById('betModal').style.display = 'block';
+                document.getElementById('betAmountInput').value = '10'; // Default bet amount
+            });
+        });
+
+        document.getElementById('confirmBetBtn').addEventListener('click', () => {
+            const amount = parseFloat(document.getElementById('betAmountInput').value);
+            if (selectedBet && amount) {
+                placeBet(selectedBet, amount);
+            }
+        });
+
+        function closeModal() {
+            document.getElementById('betModal').style.display = 'none';
+            selectedBet = null;
+        }
+        
+        function setBetAmount(amount) {
+            document.getElementById('betAmountInput').value = amount;
+        }
+        
+        function multiplyBetAmount(multiplier) {
+             const input = document.getElementById('betAmountInput');
+             let current = parseFloat(input.value) || 0;
+             input.value = (current * multiplier).toFixed(2);
+        }
+
+        window.onclick = function(event) {
+            if (event.target == document.getElementById('betModal')) {
+                closeModal();
+            }
+        }
+    </script>
+
+</body>
+</html>
