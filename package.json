@@ -1,5 +1,8 @@
 {
-  "name": "telegram-betting-game",
+  "name": "telegram-bot",
+  "engines": {
+    "node": ">=18.x" 
+  "dependencies": {
   "version": "1.0.0",
   "description": "Telegram Web App Betting Game Backend",
   "main": "api/bot.js",
