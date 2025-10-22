@@ -23,9 +23,13 @@ const mainKeyboard = {
 // --- Core Utility Functions ---
 
 async function initializeUser(msg) {
+   
     await connectToDatabase();
+    const chatId = msg.chat.id;
     const telegramId = msg.from.id;
     let user = await User.findOne({ telegramId });
+
+    console.log(`[DEBUG] Initializing user ID: ${tgId}`);
     
     // If no user, create one.
     if (!user) {
