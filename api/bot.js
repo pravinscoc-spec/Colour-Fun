@@ -449,16 +449,19 @@ bot.on('callback_query', async (callbackQuery) => {
 
 // --- Webhook Export for Vercel ---
 module.exports = async (req, res) => {
+    // --- ADD THIS LOG ---
+    console.log(`[DEBUG] Webhook received for method: ${req.method}`); 
+    // ---------------------
+
     if (req.method !== 'POST') {
-        res.status(200).send('OK');
-        return;
+        return res.status(405).send('Method Not Allowed');
     }
+
     try {
-        const update = req.body;
-        bot.processUpdate(update);
+        bot.processUpdate(req.body);
         res.status(200).send('OK');
     } catch (error) {
-        console.error('Error processing update:', error.message);
-        res.status(500).send('Internel Server Error');
+        console.error("Critical Webhook processing error:", error);
+        res.status(500).send("Internal Server Error");
     }
 };
