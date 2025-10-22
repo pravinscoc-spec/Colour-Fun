@@ -455,6 +455,6 @@ module.exports = async (req, res) => {
         res.status(200).send('OK');
     } catch (error) {
         console.error('Error processing update:', error.message);
-        res.status(500).send('Error');
+        res.status(500).send('Internel Server Error');
     }
 };
